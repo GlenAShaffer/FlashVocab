@@ -11,7 +11,13 @@ pub mod flasher{
     impl Fact{
         pub fn check(&mut self, r: String) -> bool {
             self.last_checked = SystemTime::now();
-            r == self.answer
+            if r == self.answer {
+                self.score += 1;
+                return true;
+            } else {
+                self.score = 0;
+                return false;
+            }
         }
 
         pub fn get_score(&self) -> u32{
@@ -71,6 +77,24 @@ mod tests{
     }
 
     #[test]
+    fn fact_correct_check_increments_score(){
+        let mut f = new_fact("Test prompt", "Test answer", 0);
+
+        f.check(String::from("Test answer"));
+
+        assert_eq!(f.get_score(), 1);
+    }
+
+    #[test]
+    fn fact_incorrect_check_resets_score(){
+        let mut f = new_fact("Test prompt", "Test answer", 10);
+
+        f.check(String::from("Not the test answer"));
+
+        assert_eq!(f.get_score(), 0);
+    }
+
+    #[test]
     fn fact_get_duration_returns_duration(){
         let f = new_fact("Test prompt", "Test answer", 0);
         let time_result = f.get_duration();
@@ -82,7 +106,7 @@ mod tests{
     }
 
     #[test]
-    fn check_updates_duration(){
+    fn fact_check_updates_duration(){
         let mut f = new_fact("Test prompt", "Test answer", 0);
         let reference_time = SystemTime::now();
 

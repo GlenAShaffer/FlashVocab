@@ -1,6 +1,7 @@
 pub mod flasher{
     use std::time::{Duration, SystemTime, SystemTimeError};
-    //Fact enum
+    //Fact struct
+    //This struct represents a prompt and an expected answer, as well as how many times the user has answered it correctly in a row, and the last time the fact was checked.
     pub struct Fact{
         prompt: String,
         answer: String,
@@ -8,7 +9,7 @@ pub mod flasher{
         last_checked: SystemTime,
     }
 
-    impl Fact{
+    impl Fact {
         pub fn check(&mut self, r: String) -> bool {
             self.last_checked = SystemTime::now();
             if r == self.answer {
@@ -39,7 +40,28 @@ pub mod flasher{
             last_checked: SystemTime::now(),
         };
 
-        return f;
+        f
+    }
+
+    //Lesson struct
+    pub struct Lesson {
+        name: String,
+        facts: Vec<Fact>,
+    }
+
+    impl Lesson {
+        pub fn get_name(&self) -> String{
+            String::from(&self.name)
+        }
+    }
+
+    pub fn new_lesson(name: &str, facts: Vec<Fact>) -> Lesson {
+        let l = Lesson {
+            name: String::from(name),
+            facts,
+        };
+
+        l
     }
 }
 
@@ -126,5 +148,19 @@ mod tests{
             Ok(duration) => assert!(duration.checked_sub(fact_duration) > Some(Duration::from_millis(250))),
             Err(error) => panic!("Problem calculating duration: {error:?}"),
         }
+    }
+
+    #[test]
+    //Lesson struct tests
+    fn lesson_get_name_returns_name(){
+        let f0 = new_fact("Test prompt0", "Test answer0", 0);
+        let f1 = new_fact("Test prompt1", "Test answer1", 0);
+
+        let mut lessons = Vec::new();
+        lessons.push(f0);
+        lessons.push(f1);
+
+        let l = new_lesson("Test Lesson", lessons);
+        assert_eq!(l.get_name(), "Test Lesson");
     }
 }

@@ -1,5 +1,6 @@
 pub mod flasher{
     use std::time::{Duration, SystemTime, SystemTimeError};
+
     //Fact struct
     //This struct represents a prompt and an expected answer, as well as how many times the user has answered it correctly in a row, and the last time the fact was checked.
     #[derive(Debug)]
@@ -62,6 +63,7 @@ pub mod flasher{
     }
 
     //Lesson struct
+    #[derive(Debug)]
     pub struct Lesson {
         name: String,
         facts: Vec<Fact>,
@@ -133,6 +135,22 @@ pub mod flasher{
         }
     }
 
+    impl PartialEq<Lesson> for &mut Lesson {
+        fn eq(&self, other: &Lesson) -> bool {
+            return self.name == other.name;
+        }
+    }
+
+    impl Clone for Lesson {
+        fn clone(&self) -> Self {
+            Lesson {
+                name: String::from(&self.name),
+                facts: self.facts.clone(),
+                goal: self.goal,
+            }
+        }
+    }
+
     pub fn new_lesson(name: &str, facts: Vec<Fact>) -> Lesson {
         let l = Lesson {
             name: String::from(name),
@@ -152,6 +170,27 @@ pub mod flasher{
 
         l
     }
+
+    pub struct Course {
+        name: String,
+        lessons: Vec<Lesson>,
+    }
+
+    impl Course {
+        pub fn get_lesson(&mut self, index: usize) -> &mut Lesson{
+            self.lessons.get_mut(index).expect(&format!("Cannot get lesson {} from course.", index))
+        }
+    }
+
+    pub fn new_course(name: &str, lessons: Vec<Lesson>) -> Course{
+        let c = Course {
+            name: String::from(name),
+            lessons,
+        };
+
+        c
+    }
+
 }
 
 //Unit tests
@@ -340,5 +379,28 @@ mod tests{
         let mut l = new_lesson("Test Lesson", facts);
 
         assert_eq!(l.completion().round(), 0.0_f32.round());
+    }
+
+    #[test]
+    fn course_get_lesson_returns() {
+        let f0 = new_fact("Test prompt0", "Test answer0", 0);
+        let f1 = new_fact("Test prompt1", "Test answer1", 1);
+
+        let mut facts = Vec::new();
+        facts.push(f0.clone());
+        facts.push(f1.clone());
+
+        let mut l0 = new_lesson("Test Lesson 0", facts);
+        let mut l1 = new_lesson("Test Lesson 1", facts);
+        let mut l2 = new_lesson("Test Lesson 2", facts);
+
+        let mut lessons = Vec::new();
+        lessons.push(l0.clone());
+        lessons.push(l1.clone());
+        lessons.push(l2.clone());
+
+        let mut c = new_course("Test Course 0", lessons);
+
+        assert_eq!(c.get_lesson(0), l0);
     }
 }

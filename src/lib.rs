@@ -382,7 +382,7 @@ mod tests{
     }
 
     #[test]
-    fn course_get_lesson_returns() {
+    fn course_get_lesson_returns_lesson() {
         let f0 = new_fact("Test prompt0", "Test answer0", 0);
         let f1 = new_fact("Test prompt1", "Test answer1", 1);
 
@@ -390,8 +390,8 @@ mod tests{
         facts.push(f0.clone());
         facts.push(f1.clone());
 
-        let mut l0 = new_lesson("Test Lesson 0", facts);
-        let mut l1 = new_lesson("Test Lesson 1", facts);
+        let mut l0 = new_lesson("Test Lesson 0", facts.clone());
+        let mut l1 = new_lesson("Test Lesson 1", facts.clone());
         let mut l2 = new_lesson("Test Lesson 2", facts);
 
         let mut lessons = Vec::new();
